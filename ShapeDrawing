@@ -1,0 +1,80 @@
+import javax.swing.*;
+import java.awt.*;
+
+public class ShapeDrawing {
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Threaded Shape Drawing");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 600);
+        frame.add(new DrawingPanel());
+        frame.setVisible(true);
+    }
+
+    static class DrawingPanel extends JPanel {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            // You can start drawing shapes here using threads
+            Thread triangleThread = new Thread(new Triangle(g));
+            Thread squareThread = new Thread(new Square(g));
+            Thread circleThread = new Thread(new Circle(g));
+
+            triangleThread.start();
+            squareThread.start();
+            circleThread.start();
+
+            try {
+                triangleThread.join();
+                squareThread.join();
+                circleThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    static class Triangle implements Runnable {
+        private Graphics g;
+
+        public Triangle(Graphics g) {
+            this.g = g;
+        }
+
+        @Override
+        public void run() {
+            g.setColor(Color.RED);
+            int[] xPoints = {250, 300, 200};
+            int[] yPoints = {100, 300, 300};
+            g.fillPolygon(xPoints, yPoints, 3);
+        }
+    }
+
+    static class Square implements Runnable {
+        private Graphics g;
+
+        public Square(Graphics g) {
+            this.g = g;
+        }
+
+        @Override
+        public void run() {
+            g.setColor(Color.GREEN);
+            g.fillRect(350, 150, 100, 100);
+        }
+    }
+
+    static class Circle implements Runnable {
+        private Graphics g;
+
+        public Circle(Graphics g) {
+            this.g = g;
+        }
+
+        @Override
+        public void run() {
+            g.setColor(Color.BLUE);
+            g.fillOval(100, 150, 100, 100);
+        }
+    }
+}
